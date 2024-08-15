@@ -1,0 +1,52 @@
+name: Azure Bicep Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Echo Script
+        run: echo Starting Bicep...
+      - name: Login with Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: Deploy the Bicep Script
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: "vibakar-rg"
+          template: main.bicep
+          parameters: params.bicepparam
+
+
+## ** You can uncomment below code to deploy the resources, but 
+## for simplicity use the above ****
+#############################################
+# name: Deploy Azure Resources
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#       - name: Set up Azure CLI
+#         uses: azure/login@v1
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}
+#       - name: Install Bicep CLI
+#         run: |
+#           curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+#           chmod +x ./bicep
+#           sudo mv ./bicep /usr/local/bin/bicep
+#       - name: Build and deploy Azure resources
+#         run: |
+#           bicep build main.bicep
+#           az deployment sub create --name myDeployment --location uksouth --template-file ./main.json
